@@ -1,0 +1,77 @@
+$base-bg : url("../img/water1.png") no-repeat;
+
+.field.water {
+  position: relative;
+  background: $base-bg;
+  background-size: cover;
+}
+
+@each $direction in top, bottom, left, right {
+  .field.water.coast-#{$direction} {
+    background: url("../img/#{$direction}.png") no-repeat #{$direction}, $base-bg;
+    background-size: contain, cover;
+  }
+}
+
+@each $direction in top, bottom {
+  @each $rl-direction in left, right {
+    .field.water.coast-#{$rl-direction}.coast-#{$direction} {
+      background: url("../img/in-#{$direction}-#{$rl-direction}.png") no-repeat #{$direction} #{$rl-direction},
+      url("../img/#{$rl-direction}.png") no-repeat #{$rl-direction},
+      url("../img/#{$direction}.png") no-repeat #{$direction},
+      $base-bg;
+      background-size: 50%, contain, contain, cover;
+    }
+  }
+
+  .field.water.coast-right.coast-left.coast-#{$direction} {
+    background: url("../img/in-#{$direction}-right.png") no-repeat #{$direction} right,
+    url("../img/in-#{$direction}-left.png") no-repeat #{$direction} left,
+    url("../img/left.png") no-repeat left,
+    url("../img/right.png") no-repeat right;
+    background-size: 50%, 50%, contain, contain;
+  }
+}
+
+@each $direction, $side in (left, right), (top, bottom) {
+  .field.water.coast-#{$direction}.coast-#{$side} {
+    background: url("../img/#{$direction}.png") no-repeat #{$direction},
+    url("../img/#{$side}.png") no-repeat #{$side};
+    background-size: contain;
+  }
+}
+
+@each $direction in left, right {
+  .field.water.coast-top.coast-bottom.coast-#{$direction} {
+    background: url("../img/in-top-#{$direction}.png") no-repeat top #{$direction},
+    url("../img/in-bottom-#{$direction}.png") no-repeat bottom #{$direction},
+    url("../img/top.png") no-repeat top,
+    url("../img/bottom.png") no-repeat bottom;
+    background-size: 50%, 50%, contain, contain;
+  }
+}
+
+.field.water.coast-top.coast-right.coast-bottom.coast-left {
+  background: url("../img/in-top-right.png") no-repeat top right,
+  url("../img/in-top-left.png") no-repeat top left,
+  url("../img/in-bottom-right.png") no-repeat bottom right,
+  url("../img/in-bottom-left.png") no-repeat bottom left;
+  background-size: 50%;
+}
+
+/*Angles*/
+@each $direction, $side in (bottom, left), (bottom, right), (top, left), (top, right) {
+  .field.water .angle-#{$direction}-#{$side} {
+    background: url("../img/out-#{$direction}-#{$side}.png") no-repeat;
+    #{$direction}: 0;
+    #{$side}: 0;
+  }
+}
+
+.field.water .angle {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  z-index: 1;
+  background-size: cover;
+}
