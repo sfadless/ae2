@@ -10,21 +10,17 @@ export default class Map {
         this.fields = [];
         this.units = [];
 
-        for (let i = 0; i < this.height; i++) {
-            this.fields[i] = [];
+        for (let x = 0; x < this.width; x++) {
+            this.fields[x] = [];
 
-            for (let j = 0; j < this.width; j++) {
-                this.fields[i][j] = new Snow();
+            for (let y = 0; y < this.height; y++) {
+                this.addField(new Snow(), x + 1, y + 1);
             }
         }
     }
 
     addField(field, x, y) {
-        if (
-            !(field instanceof FieldType)
-            || this.fields[x - 1] === undefined
-            || this.fields[x - 1][y - 1] === undefined
-        ) {
+        if (!(field instanceof FieldType)) {
             return false;
         }
 
@@ -35,15 +31,46 @@ export default class Map {
         field.map = this;
     }
 
-    addUnit(unit, x, y) {console.log(345);
-        if (!(unit instanceof Unit)) {
-            return false;
+    /**
+     *
+     * @param x
+     * @param y
+     * @param distance
+     * @returns {Array}
+     */
+    getFieldsOnDistance(x, y, distance) {
+        const fields = [];
+
+        for (let l = distance; l > 0; l--) {
+            this.issetField(x - l, y) ? fields.push(this.getField(x - l, y)) : false;
+            this.issetField(x + l, y) ? fields.push(this.getField(x + l, y)) : false;
+            this.issetField(x, y - l) ? fields.push(this.getField(x, y - l)) : false;
+            this.issetField(x, y + l) ? fields.push(this.getField(x, y + l)) : false;
+
+            for (let i = l - 1, j = 1; i > 0, j < l; i--, j++) {
+                this.issetField(x - i, y - j) ? fields.push(this.getField(x - i, y - j)) : false;
+                this.issetField(x - i, y + j) ? fields.push(this.getField(x - i, y + j)) : false;
+                this.issetField(x + i, y - j) ? fields.push(this.getField(x + i, y - j)) : false;
+                this.issetField(x + i, y + j) ? fields.push(this.getField(x + i, y + j)) : false;
+            }
         }
 
-        this.units.push(unit);
+        return fields;
+    }
 
-        unit.positionX = x;
-        unit.positionY = y;
+    /**
+     *
+     * @param x
+     * @param y
+     * @returns {boolean}
+     */
+    issetField(x, y) {
+        return (
+            x > 0
+            && y > 0
+            && x <= this.width
+            && y <= this.height
+        );
     }
 
     /**
@@ -53,6 +80,10 @@ export default class Map {
      * @returns {FieldType}
      */
     getField(x, y) {
+        if (!this.issetField(x, y)) {
+            return null;
+        }
+
         return this.fields[x - 1][y - 1];
     }
 }

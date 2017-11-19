@@ -23,9 +23,9 @@ export default class FieldType {
         }
 
         switch (direction) {
-            case 'top' : return this.positionY > 1 ? this.map.getField(this.positionX, this.positionY - 1) : null;
+            case 'top' : return this.positionY < this.map.height ? this.map.getField(this.positionX, this.positionY + 1) : null;
             case 'right' : return this.positionX < this.map.width ? this.map.getField(this.positionX + 1, this.positionY) : null;
-            case 'bottom' : return this.positionY < this.map.height ? this.map.getField(this.positionX, this.positionY + 1) : null;
+            case 'bottom' : return this.positionY > 1 ? this.map.getField(this.positionX, this.positionY - 1) : null;
             case 'left' : return this.positionX > 1 ? this.map.getField(this.positionX - 1, this.positionY) : null;
             default : return null;
         }
