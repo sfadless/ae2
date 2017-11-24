@@ -1,21 +1,35 @@
 import $ from 'jquery';
 import Map from '../Map/Map';
+import Dispatcher from './Dispatcher';
 
 export default class Game {
     constructor() {
-        this.selectedUnit = null;
+        // this.selectedUnit = null;
+        this.borderLength = 40;
     }
 
     init(map, players) {
+        this.dispathcer = Dispatcher;
         this.container = $('#container');
 
         this.map = map;
         this.players = players;
+        this.currentPlayer = null;
         this.initMap(map);
-        this.initPlayers();
+        // this.initPlayers();
+        this.initControls();
         this.illuminatedFields = [];
 
-        console.log(this);
+        this.dispathcer.on('next_player',function (event, args) {
+            args.oldPlayer.beforeEndTurn();
+            args.newPlayer.onNewTurn();
+        });
+
+        this.nextPlayer();
+    }
+
+    initControls() {
+        $('.next-player-button').on('click', () => this.nextPlayer())
     }
 
     initMap() {
@@ -25,7 +39,7 @@ export default class Game {
 
         const mapWidth = this.map.width;
         const mapHeight = this.map.height;
-        const fieldCorner = 40;
+        const fieldCorner = this.borderLength;
 
         this.container.css({
             width : (mapWidth * fieldCorner) + 'px',
@@ -48,47 +62,78 @@ export default class Game {
 
     initPlayers() {
         for (let i = 0; i < this.players.length; i++) {
-            let player = this.players[i];
+            // let player = this.players[i];
+            // player.dispather = this.dispathcer;
 
-            for (let j = 0; j < player.units.length; j++) {
-                let unit = player.units[j];
-                let element = $('<div class="unit"></div>');
-                unit.DOMElement = element;
-                element.addClass(unit.name);
-                unit.setPosition(40);
-                unit.DOMElement = element;
-                this.container.append(element);
-                unit.game = this;
-                unit.postInit();
-            }
+            // for (let j = 0; j < player.units.length; j++) {
+            //     let unit = player.units[j];
+            //     unit.init(this, this.borderLength);
+            // }
         }
     }
 
-    illuminateFields(fields) {
-        this.clearIlluminated();
-        this.illuminatedFields = fields;
+    getAllUnits() {
+        const units = [];
 
-        let illuminatedFieldsClickHandler = (field) => {
-            this.selectedUnit.move(field.positionX, field.positionY);
-            this.selectedUnit = null;
-            this.clearIlluminated();
-        };
-
-        this.illuminatedFields.map((field) => {
-            field.DOMElement.addClass('illuminated');
-
-            field.DOMElement.on('click', () => illuminatedFieldsClickHandler(field));
+        this.players.map((player) => {
+            player.units.map((unit) => {
+                units.push(unit);
+            });
         });
 
-        $('.field:not(.illuminated)').on('click', () => this.clearIlluminated());
+        return units;
     }
 
-    clearIlluminated() {
-        this.illuminatedFields.map((field) => {
-            field.DOMElement.removeClass('illuminated');
-            field.DOMElement.off('click')
+    nextPlayer() {
+        if (!this.currentPlayer) {
+            this.currentPlayer = this.players[0];
+
+            return;
+        }
+
+        const totalPlayers = this.players.length;
+        let playerMark = 0;
+
+        for (let i = 0; i < totalPlayers; i++) {
+            if (this.currentPlayer === this.players[i]) {
+                playerMark = i + 1;
+            }
+        }
+
+        if (playerMark === totalPlayers) {
+            playerMark = 0;
+        }
+
+        this.dispathcer.fire('next_player', {
+            oldPlayer: this.currentPlayer,
+            newPlayer: this.players[playerMark]
         });
 
-        this.illuminatedFields = [];
+        this.currentPlayer = this.players[playerMark];
+    }
+
+    hasUnitsOnFields(fields) {
+        let has = false;
+
+        fields.map((field) => {
+            if (this.hasUnitOnField(field)) {console.log(345);
+                has = true;
+            }
+        });
+
+        return has;
+    }
+
+    hasUnitOnField(field) {
+        const units = this.getAllUnits();
+        const unitsCount = units.length;
+
+        for (let i = 0; i < unitsCount; i++) {
+            if (units[i].positionX === field.positionX && units[i].positionY === field.positionY) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

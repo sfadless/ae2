@@ -3,12 +3,26 @@
   width: 40px;
   height: 40px;
 }
-.field.illuminated:before {
+.field.illuminated:before, .field.illuminated:after {
+  z-index: 2;
   content: '';
   position: absolute;
   top: 2px;
   left: 2px;
   bottom: 2px;
   right: 2px;
-  background: rgba(30, 144, 255, .5);
+  opacity: .5;
+  transition: .3s;
+}
+.field.illuminated:before:hover, .field.illuminated:after:hover {
+  opacity: 0.8;
+}
+.field.illuminated.move:before {
+  background-color: #1E90FF;
+}
+.field.illuminated.attack:before {
+  background-color: #FF1E1E;
+}
+.field.illuminated.attack:after {
+  z-index: 4;
 }

@@ -9,6 +9,8 @@ export default class Map {
         this.objects = [];
         this.fields = [];
         this.units = [];
+        this.currentIlluminatedClass = null;
+        this.illuminatedFields = [];
 
         for (let x = 0; x < this.width; x++) {
             this.fields[x] = [];
@@ -85,5 +87,36 @@ export default class Map {
         }
 
         return this.fields[x - 1][y - 1];
+    }
+
+    /**
+     *
+     * @param fields
+     * @param type
+     * @param handler
+     */
+    illuminateFields(fields, type, handler) {
+        this.clearIlluminated();
+
+        this.currentIlluminatedClass = type;
+        this.illuminatedFields = fields;
+
+        this.illuminatedFields.map((field) => {
+            field.DOMElement.addClass('illuminated ' + this.currentIlluminatedClass);
+            field.DOMElement.on('click', () => {
+                handler(field);
+                this.clearIlluminated();
+            });
+        })
+    }
+
+    /**
+     *
+     */
+    clearIlluminated() {
+        this.illuminatedFields.map((field) => {
+            field.DOMElement.removeClass('illuminated ' + this.currentIlluminatedClass);
+            field.DOMElement.off('click');
+        })
     }
 }

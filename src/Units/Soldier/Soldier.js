@@ -6,5 +6,6 @@ export default class Soldier extends Unit {
 
         this.name = 'soldier';
         this.speed = 5;
+        this.attackRange = 1;
     }
 }
