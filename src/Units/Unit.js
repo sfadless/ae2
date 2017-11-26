@@ -5,6 +5,7 @@ export default class Unit {
         this.positionX = x;
         this.positionY = y;
 
+        this.canAttack = true;
         this.speed = 0;
         this.attackRange = 0;
         this.DOMElement = null;
@@ -31,63 +32,28 @@ export default class Unit {
         this.player = player;
     }
 
-    onSelect(game) {
-        console.log(game);
-        if (this.disabled || game.currentPlayer !== this.player) {
-            return;
-        }
-
-        const fields = this.getMoveFields();
-
-        game.map.illuminateFields(fields, 'move', (field) => {
-            this.move(field.positionX, field.positionY)
-        });
-    }
-
-    getMoveFields() {
-        let fields = this.game.map.getFieldsOnDistance(this.positionX, this.positionY, this.speed);
-
-        let units = this.game.getAllUnits();
-
-        fields.map((field) => {
-            units.map((unit) => {
-                if (field.positionX === unit.positionX && field.positionY === unit.positionY) {
-                    fields.splice(fields.indexOf(field), 1);
-                }
-            });
-        });
-
-        return fields;
-    }
-
-    getAttackFields() {
-        return this.game.map.getFieldsOnDistance(this.positionX, this.positionY, this.attackRange);
-    }
-
     move(x, y) {
         this.positionX = x;
         this.positionY = y;
 
         this.setPosition(40);
-        setTimeout(() => this.postMove(), this.moveSpeed);
-    }
-
-    postInit() {
-        this.DOMElement.on('click', () => {
-            this.onSelect();
-        });
     }
 
     postMove() {
-        const fields = this.getAttackFields();
+        // const fields = this.getAttackFields();
 
-        if (this.game.hasUnitsOnFields(fields)) {
-            this.getMap().illuminateFields(fields, 'attack', function(field) {
-                console.log(field);
-            });
-        } else {
-            this.disable();
-        }
+        this.disable();
+        // if (this.game.hasUnitsOnFields(fields)) {
+        //     this.getMap().illuminateFields(fields, 'attack', function(field) {
+        //         console.log(field);
+        //     });
+        // } else {
+        //     this.disable();
+        // }
+    }
+
+    postInit() {
+
     }
 
     init(borderLength) {
@@ -95,14 +61,6 @@ export default class Unit {
         this.DOMElement.addClass(this.name);
         this.DOMElement.addClass(this.player.color);
         this.setPosition(borderLength);
-    }
-
-    /**
-     *
-     * @returns {boolean | Map}
-     */
-    getMap() {
-        return this.game ? this.game.map : false;
     }
 
     getAttackPower() {

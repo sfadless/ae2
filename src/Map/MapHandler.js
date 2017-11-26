@@ -1,13 +1,13 @@
 export default class MapHandler {
-    constructor(map, units, game) {
+    constructor(map, game, dispatcher) {
         this.map = map;
-        this.units = units;
+        this.units = game.getAllUnits();
         this.game = game;
-        console.log(this);
+        this.dispatcher = dispatcher;
         this.initUnits();
     }
 
-    getMoveFields(unit) {
+    getUnitMoveFields(unit) {
         let fields = this.map.getFieldsOnDistance(unit.positionX, unit.positionY, unit.speed);
 
         fields.map((field) => {
@@ -32,12 +32,37 @@ export default class MapHandler {
         this.game.container.append(unit.DOMElement);
         unit.postInit();
 
-        unit.DOMElement.on('click', (game) => {
-            unit.onSelect(game);
+        unit.DOMElement.on('click', () => {
+            this.dispatcher.fire('map_handler.unit_clicked', {
+                unit : unit,
+                currentPlayer : this.game.currentPlayer,
+                mapHandler: this
+            });
         });
     }
 
+    illuminateUnitMoveFields(unit) {
+        const type = 'move';
+        const fields = this.getUnitMoveFields(unit);
+
+        this.map.illuminateFields(fields, type, (field) => {
+            this.dispatcher.fire('map_handler.illuminated_field_clicked', {
+                field : field,
+                selectedUnit: unit,
+                mapHandler: this,
+                type: type
+            });
+        })
+    }
+
     moveUnit(unit, field) {
-        // unit.move(field.positionX, field.positionY);
+        unit.move(field.positionX, field.positionY);
+
+        setTimeout(() => {
+            this.dispatcher.fire('map_handler.unit_post_move', {
+                unit: unit,
+                mapHandler: this,
+            })
+        }, unit.moveSpeed);
     }
 }

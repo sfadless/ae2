@@ -1,15 +1,20 @@
 import $ from 'jquery';
 import Map from '../Map/Map';
-import Dispatcher from './Dispatcher';
+import UnitEventListener from '../EventListeners/UnitEventListeners';
 
 export default class Game {
-    constructor() {
+    constructor(dispatcher) {
+        this.dispathcer = dispatcher;
         // this.selectedUnit = null;
+        this.listeners = [
+            new UnitEventListener(dispatcher)
+        ];
+
         this.borderLength = 40;
     }
 
     init(map, players) {
-        this.dispathcer = Dispatcher;
+
         this.container = $('#container');
 
         this.map = map;
@@ -18,9 +23,10 @@ export default class Game {
         this.initMap(map);
         // this.initPlayers();
         this.initControls();
+        this.initListeners();
         this.illuminatedFields = [];
 
-        this.dispathcer.on('next_player',function (event, args) {
+        this.dispathcer.on('next_player', function (event, args) {
             args.oldPlayer.beforeEndTurn();
             args.newPlayer.onNewTurn();
         });
@@ -135,5 +141,13 @@ export default class Game {
         }
 
         return false;
+    }
+
+    initListeners() {
+        const countListeners = this.listeners.length;
+
+        for (let i = 0; i < countListeners; i++) {
+            this.listeners[i].register();
+        }
     }
 }
